@@ -4,7 +4,8 @@
       <div class = "login-title">登录</div>
       <input class = "login-input login-item" type="text" placeholder="请输入账号" v-model="userName">
       <input class = "login-input login-item" type="text" placeholder="请输入密码" v-model="userPwd">
-      <input class = "login-button login-item"type="button" value="确认">
+      <p v-show="showErr">{{errorInfo}}</p>
+      <input class = "login-button login-item" type="button" value="确认" v-bind:disabled="inputInvalid">
       <span class = "login-tip" v-on:click="changeViewType">没有账号？马上注册</span>
     </div>
     <div class="login-wrap" v-show="!showLogin">
@@ -12,7 +13,8 @@
       <input class = "login-input login-item" type="text" placeholder="请输入账号" v-model="userName">
       <input class = "login-input login-item" type="text" placeholder="请输入密码" v-model="userPwd">
       <input class = "login-input login-item" type="text" placeholder="请重复密码" v-model="userPwdAgain">
-      <input class = "login-button login-item"type="button" value="确认">
+      <p v-show="showErr">{{errorInfo}}</p>
+      <input class = "login-button login-item" type="button" value="确认" v-bind:disabled="inputInvalid">
       <span class = "login-tip" v-on:click="changeViewType">已有账号？马上登录</span>
     </div>
   </div>
@@ -25,15 +27,34 @@ export default {
     return {
       msg: '注册账号',
       showLogin: true,
+      showErr: false,
       userName: '',
       userPwd: '',
       userPwdAgain: '',
+      errorInfo: '',
+      count: 1
     }
   },
   methods: {
-    changeViewType (){
-    this.showLogin = !this.showLogin;
-    },
+    changeViewType () {
+      this.showLogin = !this.showLogin
+      this.showErr = false
+      this.count++
+    }
+  },
+  computed: {
+    inputInvalid () {
+      if (this.userName === undefined || this.userPwd === undefined) {
+        return true
+      }
+      if (this.userName.length === 0 || this.userPwd.length === 0) {
+        return true
+      }
+      if (!this.showLogin && this.userPwd !== this.userPwdAgain) {
+        return true
+      }
+      return false
+    }
   }
 }
 </script>
@@ -68,10 +89,14 @@ export default {
 }
 
 .login-button {
-  border:none; 
-  background-color:#41b883; 
-  color:#fff; 
-  margin-bottom:5px;
+  border: none; 
+  background-color: #41b883; 
+  color: #fff; 
+  margin-bottom: 5px;
+}
+
+.login-button:disabled {
+  background-color: lightgray;
 }
 
 .login-tip {
