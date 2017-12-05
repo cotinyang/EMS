@@ -2,16 +2,18 @@
   <div class="login">
     <div class="login-wrap" v-show="showLogin">
       <div class = "login-title">登录</div>
-      <input class = "login-input login-item" type="text" placeholder="请输入账号">
-      <input class = "login-input login-item" type="text" placeholder="请输入密码">
+      <input class = "login-input login-item" type="text" placeholder="请输入账号" v-model="userName">
+      <input class = "login-input login-item" type="text" placeholder="请输入密码" v-model="userPwd">
       <input class = "login-button login-item"type="button" value="确认">
+      <span class = "login-tip" v-on:click="changeViewType">没有账号？马上注册</span>
     </div>
     <div class="login-wrap" v-show="!showLogin">
       <div class = "login-title">注册</div>
-      <input class = "login-input login-item" type="text" placeholder="请输入账号">
-      <input class = "login-input login-item" type="text" placeholder="请输入密码">
-      <input class = "login-input login-item" type="text" placeholder="请重复密码">
+      <input class = "login-input login-item" type="text" placeholder="请输入账号" v-model="userName">
+      <input class = "login-input login-item" type="text" placeholder="请输入密码" v-model="userPwd">
+      <input class = "login-input login-item" type="text" placeholder="请重复密码" v-model="userPwdAgain">
       <input class = "login-button login-item"type="button" value="确认">
+      <span class = "login-tip" v-on:click="changeViewType">已有账号？马上登录</span>
     </div>
   </div>
 </template>
@@ -23,13 +25,26 @@ export default {
     return {
       msg: '注册账号',
       showLogin: true,
+      userName: '',
+      userPwd: '',
+      userPwdAgain: '',
     }
+  },
+  methods: {
+    changeViewType (){
+    this.showLogin = !this.showLogin;
+    },
   }
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+.login-title {
+  font-size: 150%;
+  margin-bottom: 10px;
+}
 
 .login-wrap {
   text-align: center;
@@ -41,6 +56,7 @@ export default {
   height: 40px; 
   line-height: 40px; 
   margin: auto;
+  font-size: 100%;
 }
 
 .login-input {
@@ -55,8 +71,15 @@ export default {
   border:none; 
   background-color:#41b883; 
   color:#fff; 
-  font-size:16px; 
   margin-bottom:5px;
+}
+
+.login-tip {
+  font-size: 100%;
+  cursor: pointer;
+}
+.login-tip:hover {
+  color: #41b883;
 }
 
 </style>
