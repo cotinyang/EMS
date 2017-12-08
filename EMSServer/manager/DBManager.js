@@ -7,11 +7,6 @@ var DBManager = module.exports = function DBManager(path) {
   }
   var db = monk(path);
   this.userCollection = db.get('user');  
-  var mid = function (req, res, next) {
-    req.dbManager = this;
-    next();
-  };
-  return mid.bind(this);
 };
 
 /**
@@ -33,12 +28,21 @@ DBManager.prototype.userList = function userList(callback) {
   this.userCollection.find({}, {}, callback);
 }
 
+DBManager.prototype.user = function user(name) {
+  return this.userCollection.findOne({userName: name})
+}
 
-DBManager.prototype.addUser = function addUser(userName, userEmail, callback) {
-  this.userCollection.insert({
-    "username": userName,
-    "email": userEmail
-  }, callback);
+DBManager.prototype.addUser = function addUser(user) {
+  return this.userCollection.insert({
+    "userName": user.userName,
+    "password": user.password
+  });
+}
+
+DBManager.prototype.delUser = function delUser(userName) {
+  return this.userCollection.remove({
+    "userName": userName,
+  });
 }
 
 //authentication

@@ -3,18 +3,18 @@
     <div class="login-wrap" v-show="showLogin">
       <div class = "login-title">登录</div>
       <input class = "login-input login-item" type="text" placeholder="请输入账号" v-model="userName">
-      <input class = "login-input login-item" type="text" placeholder="请输入密码" v-model="userPwd">
+      <input class = "login-input login-item" type="password" placeholder="请输入密码" v-model="userPwd">
       <p v-show="showErr">{{errorInfo}}</p>
-      <input class = "login-button login-item" type="button" value="确认" v-bind:disabled="inputInvalid">
+      <input class = "login-button login-item" type="button" v-on:click="login" value="确认" v-bind:disabled="inputInvalid">
       <span class = "login-tip" v-on:click="changeViewType">没有账号？马上注册</span>
     </div>
     <div class="login-wrap" v-show="!showLogin">
       <div class = "login-title">注册</div>
       <input class = "login-input login-item" type="text" placeholder="请输入账号" v-model="userName">
-      <input class = "login-input login-item" type="text" placeholder="请输入密码" v-model="userPwd">
-      <input class = "login-input login-item" type="text" placeholder="请重复密码" v-model="userPwdAgain">
+      <input class = "login-input login-item" type="password" placeholder="请输入密码" v-model="userPwd">
+      <input class = "login-input login-item" type="password" placeholder="请重复密码" v-model="userPwdAgain">
       <p v-show="showErr">{{errorInfo}}</p>
-      <input class = "login-button login-item" type="button" value="确认" v-bind:disabled="inputInvalid">
+      <input class = "login-button login-item" type="button" v-on:click="register" value="确认" v-bind:disabled="inputInvalid">
       <span class = "login-tip" v-on:click="changeViewType">已有账号？马上登录</span>
     </div>
   </div>
@@ -40,6 +40,12 @@ export default {
       this.showLogin = !this.showLogin
       this.showErr = false
       this.count++
+    },
+    login () {
+      this.$userManager.login(this.userName, this.userPwd)
+    },
+    register () {
+
     }
   },
   computed: {

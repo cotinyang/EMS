@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import UserManager from '@/http/UserManager'
+
+Vue.prototype.$userManager = new UserManager()
 
 Vue.config.productionTip = false
 
