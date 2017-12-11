@@ -10,18 +10,29 @@ class UserManager {
     })
   }
   login (userName, password) {
-    this.http.post('/login', {
+    return this.http.post('/login', {
       userName: userName,
       password: password
     }).then(res => {
       console.log(res)
+      var errNo = res.data.errNo
+      return {success:errNo === 0}
     }).catch(error => {
 
     })
   }
 
   register (userName, password) {
+    return this.http.post('/register', {
+      userName: userName,
+      password: password
+    }).then(res => {
+      console.log(res)
+      var errNo = res.data.errNo
+      return {success:errNo === 0}
+    }).catch(error => {
 
+    })
   }
 
   logout (userName) {

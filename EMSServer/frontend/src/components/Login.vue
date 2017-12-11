@@ -42,10 +42,28 @@ export default {
       this.count++
     },
     login () {
-      this.$userManager.login(this.userName, this.userPwd)
+      this.$userManager.login(this.userName, this.userPwd).then(result => {
+        this.showErr = true
+        if(result.success) {
+          this.errorInfo = '登录成功'
+          return
+        }
+        this.errorInfo = '登录失败'
+
+      })
     },
     register () {
-
+      if(this.userPwd !== this.userPwdAgain) {
+        return
+      }
+      this.$userManager.register(this.userName, this.userPwd).then(result => {
+        this.showErr = true
+        if(result.success) {
+          this.errorInfo = '注册成功'
+          return
+        }
+        this.errorInfo = '注册失败'
+      })
     }
   },
   computed: {
