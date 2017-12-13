@@ -42,10 +42,11 @@ export default {
       this.count++
     },
     login () {
+      console.log('login.....')
       this.$userManager.login(this.userName, this.userPwd).then(result => {
         this.showErr = true
         if(result.success) {
-          this.errorInfo = '登录成功'
+          this.$router.push('/')
           return
         }
         this.errorInfo = '登录失败'

@@ -2,12 +2,6 @@ var express = require('express');
 var router = express.Router();
 var path = require('path');
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  // res.render('index', { title: 'Express' });
-  res.sendFile('index.html', {root: path.join(__dirname, '../frontend/dist')});
-});
-
 router.get('/userlist',function(req, res) {
   var dbManager = req.dbManager;
   dbManager.userList(function(e,docs) {

@@ -5,6 +5,8 @@ const ErrNo = Object.freeze({
     userNotExist: 100, 
     userExist: 101,
     userInvalidPWD: 102,
+    userNotLogin: 103,
+    userAlreadyLogin: 104,
 })
 
 module.exports = {ErrNo}
