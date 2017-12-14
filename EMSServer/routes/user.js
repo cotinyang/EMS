@@ -5,16 +5,9 @@ var CTString = require('../util/CTString')
 router.all('/*', function(req, res, next) {
   if (req.path === '/login' ||
       req.path === '/register') {
-    if (req.session.user) {
-      return res.json({ errNo: ErrNo.userAlreadyLogin, errInfo: '已登录' });
-    } else {
-      return next();
-    }
+    
   }
-  if(!req.session.user) {
-    console.log('after' + req.sessionID)    
-    return res.json({ errNo: ErrNo.userNotLogin, errInfo: '未登录' });    
-  }
+  
   next();
 })
 
@@ -40,8 +33,6 @@ router.post('/login', function(req, res, next) {
       res.send(CTString.toString({errNo:ErrNo.invalidParm,errInfo:'登录失败'}));    
       return  
     }
-    req.session.user = req.body.userName
-    console.log(req.sessionID)
     res.send(CTString.toString({errNo:ErrNo.success}));
   })
 });
@@ -59,7 +50,6 @@ router.post('/register', function(req, res, next) {
 
 /* User register */
 router.post('/delUser', function(req, res, next) {
-  req.session.user = null
   req.userManager.delUser(req.body.userName)
   .then(user => {
     res.send(CTString.toString({errNo:ErrNo.success}));    

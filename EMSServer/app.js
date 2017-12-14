@@ -5,7 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var cors = require('cors');
-var session = require('express-session');
 
 var index = require('./routes/index');
 var userApi = require('./routes/user');
@@ -35,12 +34,6 @@ app.use(cors({
   origin: 'http://localhost:8080',
   credentials: true
 }));
-app.use(session({
-  secret: 'CTYSessionSecret',
-  resave: false,
-  saveUninitialized: true,
-  cookie: { maxAge: 10000 }
-}))
 
 // app.use('/', index);
 // app.use('/users', users);
