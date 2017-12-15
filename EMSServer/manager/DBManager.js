@@ -40,8 +40,10 @@ DBManager.prototype.addUser = function addUser(user) {
 }
 
 DBManager.prototype.updateUser = function updateUser(user) {
-  return this.userCollection.update({
-    "userName": user.userName }, {$set:user});
+  return this.userCollection.update({ "userName": user.userName }, { $set: user })
+    .then(res => {
+      return res.ok === 1
+    });
 }
 
 DBManager.prototype.delUser = function delUser(userName) {

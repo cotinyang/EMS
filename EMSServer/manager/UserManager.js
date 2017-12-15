@@ -1,3 +1,17 @@
+var jwt = require('jsonwebtoken')
+
+var createToken = function (name,forRefresh) {
+  const token = jwt.sign({
+          un: name,
+          rf: forRefresh ? 1 : 0
+      },
+      'CTUserTokenSecret', {
+          expiresIn: forRefresh ? '1h':'20s' // 测试时长
+      });
+
+  return token;
+}
+
 var UserManager = module.exports = function UserManager(dbManager) {
   this.dbManager = dbManager;
   if (!(this instanceof UserManager)) {
@@ -56,12 +70,21 @@ UserManager.prototype.addUser = function addUser(user) {
   })
 }
 
-UserManager.prototype.updateToken = function updateToken(userName, accessToken) {
-  if (userName === undefined ||
-    accessToken === undefined) {
+UserManager.prototype.updateToken = function updateToken(userName) {
+  if (userName === undefined) {
     return Promise.reject(ErrNo.invalidParm)
   }
-  return this.dbManager.updateUser({userName:userName,accessToken:accessToken})
+  const accessToken = createToken(userName, false)
+  const refreshToken = createToken(userName, true)
+  var user = {
+    userName: userName,
+    accessToken: accessToken,
+    refreshToken: refreshToken
+  }
+  return this.dbManager.updateUser(user).then(res => {
+    user.success = res
+    return user
+  })
 }
 
 UserManager.prototype.delUser = function delUser(userName) {

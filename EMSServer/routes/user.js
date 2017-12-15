@@ -3,17 +3,6 @@ var router = express.Router();
 var CTString = require('../util/CTString')
 var jwt = require('jsonwebtoken')
 
-var createToken = function (name) {
-  const token = jwt.sign({
-          un: name
-      },
-      'CTUserTokenSecret', {
-          expiresIn: '10s' // 测试时长
-      });
-
-  return token;
-}
-
 router.all('/*', function(req, res, next) {
   if (req.path === '/login' ||
       req.path === '/register') {
@@ -26,11 +15,13 @@ router.all('/*', function(req, res, next) {
   if (req.headers['authorization']) {
     let token = req.headers['authorization'].split(' ')[1]
     let decoded = jwt.decode(token)
-    if (token && decoded.exp > Date.now() / 1000) {
+    if (token && decoded && decoded.rf === 0 && decoded.exp > Date.now() / 1000) {
       req.userManager.authToken(decoded.un, token)
         .then(err => {
           if (err === ErrNo.success) {
-            return next()
+            req.userName = decoded.un
+            next()
+            return
           }
           return res.json(errInfo)
         })
@@ -47,25 +38,32 @@ router.get('/', function(req, res, next) {
 
 router.all('/*', function(req, res, next) {
   res.setHeader('Content-Type', 'application/json');
-  if(!req.body.userName) {
-    res.send(CTString.toString({errNo:ErrNo.invalidParm,errInfo:'参数错误'}));    
-    return    
-  }
   next()
 })
 
 /* User login */
 router.post('/login', function(req, res, next) {
   req.userManager.auth(req.body.userName, req.body.password)
-  .then(result => {
-    if(result !== ErrNo.success) {
-      res.send(CTString.toString({errNo:ErrNo.invalidParm,errInfo:'登录失败'}));    
-      return  
-    }
-    const token = createToken(req.body.userName)
-    req.userManager.updateToken(req.body.userName, token)    
-    res.send(CTString.toString({errNo:ErrNo.success,accessToken:token}));
-  })
+    .then(result => {
+      if (result !== ErrNo.success) {
+        return Promise.reject(result)
+      }
+      return req.userManager.updateToken(req.body.userName)
+    })
+    .then(result => {
+      if(!result.success) {
+        return Promise.reject(ErrNo.serverError)
+      }
+      res.send(CTString.toString({
+        errNo: ErrNo.success,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken
+      }));
+    })
+    .catch(err => {
+      res.send(CTString.toString({ errNo: err, errInfo: '登录失败' }))      
+    })
+
 });
 
 /* User register */
@@ -99,6 +97,24 @@ router.post('/check', function(req, res, next) {
 /* User logout */
 router.post('/logout', function(req, res, next) {
   res.send('respond with a resource,logout');
+});
+
+/* User logout */
+router.post('/refreshToken', function(req, res, next) {
+  req.userManager.updateToken(req.userName)
+    .then(result => {
+      if (!result.success) {
+        return Promise.reject(ErrNo.serverError)
+      }
+      res.send(CTString.toString({
+        errNo: ErrNo.success,
+        accessToken: result.accessToken,
+        refreshToken: result.refreshToken
+      }));
+    })
+    .catch(err => {
+      res.send(CTString.toString({ errNo: err, errInfo: '登录失败' }))
+    })
 });
 
 module.exports = router;
