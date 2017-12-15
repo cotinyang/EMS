@@ -1,12 +1,14 @@
 var jwt = require('jsonwebtoken')
 
+const tokenExp = 60 * 0.3
+
 var createToken = function (name,forRefresh) {
   const token = jwt.sign({
           un: name,
           rf: forRefresh ? 1 : 0
       },
       'CTUserTokenSecret', {
-          expiresIn: forRefresh ? '1h':'20s' // 测试时长
+          expiresIn: forRefresh ? '1h': tokenExp // 测试时长
       });
 
   return token;
@@ -79,7 +81,8 @@ UserManager.prototype.updateToken = function updateToken(userName) {
   var user = {
     userName: userName,
     accessToken: accessToken,
-    refreshToken: refreshToken
+    refreshToken: refreshToken,
+    exp: tokenExp
   }
   return this.dbManager.updateUser(user).then(res => {
     user.success = res

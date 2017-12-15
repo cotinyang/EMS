@@ -41,6 +41,21 @@ router.all('/*', function(req, res, next) {
   next()
 })
 
+function responseToken(req, res){
+  return req.userManager.updateToken(req.userName)
+  .then(result => {
+    if(!result.success) {
+      return Promise.reject(ErrNo.serverError)
+    }
+    res.json({
+      errNo: ErrNo.success,
+      accessToken: result.accessToken,
+      refreshToken: result.refreshToken,
+      exp: result.exp         
+    });
+  })
+}
+
 /* User login */
 router.post('/login', function(req, res, next) {
   req.userManager.auth(req.body.userName, req.body.password)
@@ -48,22 +63,12 @@ router.post('/login', function(req, res, next) {
       if (result !== ErrNo.success) {
         return Promise.reject(result)
       }
-      return req.userManager.updateToken(req.body.userName)
-    })
-    .then(result => {
-      if(!result.success) {
-        return Promise.reject(ErrNo.serverError)
-      }
-      res.send(CTString.toString({
-        errNo: ErrNo.success,
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken
-      }));
+      req.userName = req.body.userName
+      return responseToken(req, res)
     })
     .catch(err => {
       res.send(CTString.toString({ errNo: err, errInfo: '登录失败' }))      
     })
-
 });
 
 /* User register */
@@ -100,20 +105,10 @@ router.post('/logout', function(req, res, next) {
 });
 
 /* User logout */
-router.post('/refreshToken', function(req, res, next) {
-  req.userManager.updateToken(req.userName)
-    .then(result => {
-      if (!result.success) {
-        return Promise.reject(ErrNo.serverError)
-      }
-      res.send(CTString.toString({
-        errNo: ErrNo.success,
-        accessToken: result.accessToken,
-        refreshToken: result.refreshToken
-      }));
-    })
+router.post('/refreshToken', function (req, res, next) {
+  responseToken(req, res)
     .catch(err => {
-      res.send(CTString.toString({ errNo: err, errInfo: '登录失败' }))
+      res.send(CTString.toString({ errNo: err, errInfo: '刷新失败' }))
     })
 });
 
