@@ -10,15 +10,24 @@ class UserManager {
     })
     this.http.defaults.withCredentials = true
     this.http.interceptors.request.use(config => {
-      console.log('request.........')
+      if (localStorage.getItem('accessToken')) {
+        config.headers.Authorization = `token ${localStorage.getItem('accessToken')}`
+          .replace(/(^\")|(\"$)/g, '')
+      } else {
+        router.replace({
+          path: 'login',
+          query: {
+            redirect: router.currentRoute.fullPath
+          }
+        })
+      }
       return config
     }, err => {
-      console.log('request failed.........')      
       return Promise.reject(err)      
     })
     this.http.interceptors.response.use(response => {
-      console.log('response.........')      
-      if (response.data.errNo === 103) {
+      if (response.data.errNo === 103 || 
+        response.data.errNo === 105) {
         router.replace({
           path: 'login',
           query: {
@@ -28,7 +37,6 @@ class UserManager {
       }
       return response  
     }, err => {
-      console.log('response failed.........')            
       return Promise.reject(err)
     })
   }
@@ -39,7 +47,12 @@ class UserManager {
     }).then(res => {
       console.log(res)
       var errNo = res.data.errNo
-      return {success:errNo === 0}
+      var token = res.data.accessToken
+      var success = errNo === 0
+      if (success) {
+        localStorage.setItem('accessToken', token)        
+      }
+      return {success:success}
     }).catch(error => {
 
     })
@@ -59,7 +72,7 @@ class UserManager {
   }
 
   logout (userName) {
-
+    localStorage.removeItem('accessToken')
   }
 
   checkLogin() {

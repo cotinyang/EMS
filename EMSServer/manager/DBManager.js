@@ -35,8 +35,13 @@ DBManager.prototype.user = function user(name) {
 DBManager.prototype.addUser = function addUser(user) {
   return this.userCollection.insert({
     "userName": user.userName,
-    "password": user.password
+    "password": user.password,
   });
+}
+
+DBManager.prototype.updateUser = function updateUser(user) {
+  return this.userCollection.update({
+    "userName": user.userName }, {$set:user});
 }
 
 DBManager.prototype.delUser = function delUser(userName) {
