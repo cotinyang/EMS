@@ -1,6 +1,6 @@
 var jwt = require('jsonwebtoken')
 
-const tokenExp = 60 * 0.3
+const tokenExp = 60 * 0.5
 
 var createToken = function (name,forRefresh) {
   const token = jwt.sign({
